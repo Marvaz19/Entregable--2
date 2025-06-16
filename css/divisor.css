@@ -1,0 +1,23 @@
+ 
+body {
+    background-color: #212121;
+}
+
+h1 {
+    color: #14FFEC;
+    background-color: #212121;
+    text-align: center;
+
+}
+.boxparadatos {
+    background-color: #323232;
+    color: aliceblue;
+    font-size:x-large  ;
+    
+}
+.botoncalc { 
+
+font-size: x-large;
+margin-left: 40%;
+
+}
