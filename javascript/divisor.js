@@ -1,76 +1,90 @@
+function pedirDatos() {
+    const nombres = [];
+    const montos = [];
 
-document.getElementById("crearBtn").addEventListener("click", createInputs);
-document.getElementById("calcularBtn").addEventListener("click", calcularGastos);
+    const totalPersonas = parseInt(prompt("¿Cuántas personas participaron en los gastos?"));
 
-let nombres = [];
-let gastos = [];
-let personas = [];
+    if (isNaN(totalPersonas) || totalPersonas <= 0) {
+        alert("Número inválido.");
+        return null;
+    }
 
-function createInputs() {
-  const num = parseInt(document.getElementById("numPeople").value);
-  const container = document.getElementById("peopleInputs");
-  container.innerHTML = "";
+    for (let i = 0; i < totalPersonas; i++) {
+        const nombre = prompt(`Nombre de la persona #${i + 1}:`);
+        const monto = parseFloat(prompt(`¿Cuánto gastó ${nombre}?`));
 
-  
-  nombres = [];
-  gastos = [];
-  personas = [];
+        if (nombre && !isNaN(monto) && monto >= 0) {
+            nombres.push(nombre);
+            montos.push(monto);
+        } else {
+            alert("Datos inválidos. Se omitirá esta entrada.");
+        }
+    }
 
-  console.log(`Cantidad de personas: ${num}`);
-
-  for (let i = 0; i < num; i++) {
-    container.innerHTML += `
-      <div>
-        <label>Nombre: <input type="text" id="name${i}" /></label>
-        <label>Gasto: <input type="number" id="gasto${i}" /></label>
-      </div>`;
-  }
+    return { nombres, montos };
 }
 
-function calcularGastos() {
-  const num = parseInt(document.getElementById("numPeople").value);
-  nombres = [];
-  gastos = [];
-  personas = [];
+function calcularResumen(nombres, montos) {
+    const total = montos.reduce((a, b) => a + b, 0);
+    const equitativo = total / nombres.length;
 
-  for (let i = 0; i < num; i++) {
-    const nombre = document.getElementById(`name${i}`).value;
-    const gasto = parseFloat(document.getElementById(`gasto${i}`).value) || 0;
+    let resumen = `Total gastado: $${total.toFixed(2)}\n`;
+    resumen += `Cada persona debería pagar: $${equitativo.toFixed(2)}\n\n`;
 
-    nombres.push(nombre);
-    gastos.push(gasto);
-    personas.push({ nombre, gasto });
-  }
-
-  console.log("Nombres:", nombres);
-  console.log("Gastos:", gastos);
-  console.log("Personas:", personas);
-
-  const total = gastos.reduce((sum, g) => sum + g, 0);
-  const promedio = total / num;
-
-  console.log(`Total: $${total.toFixed(2)}`);
-  console.log(`Promedio por persona: $${promedio.toFixed(2)}`);
-
-  let resultadoHTML = `<p>Total: $${total.toFixed(2)}</p>`;
-  resultadoHTML += `<p>Promedio por persona: $${promedio.toFixed(2)}</p>`;
-
-  const saldos = personas.map(p => {
-    const diferencia = parseFloat((p.gasto - promedio).toFixed(2));
-    return { nombre: p.nombre, saldo: diferencia };
-  });
-
-  console.log("Saldos individuales:", saldos);
-
-  saldos.forEach(s => {
-    if (s.saldo > 0) {
-      resultadoHTML += `<p>${s.nombre} debe recibir $${s.saldo.toFixed(2)}</p>`;
-    } else if (s.saldo < 0) {
-      resultadoHTML += `<p>${s.nombre} debe pagar $${Math.abs(s.saldo).toFixed(2)}</p>`;
-    } else {
-      resultadoHTML += `<p>${s.nombre} está saldado</p>`;
+    for (let i = 0; i < nombres.length; i++) {
+        const diferencia = montos[i] - equitativo;
+        if (diferencia > 0) {
+            resumen += `${nombres[i]} debe recibir $${diferencia.toFixed(2)}\n`;
+        } else if (diferencia < 0) {
+            resumen += `${nombres[i]} debe pagar $${Math.abs(diferencia).toFixed(2)}\n`;
+        } else {
+            resumen += `${nombres[i]} está equilibrado/a.\n`;
+        }
     }
-  });
 
-  document.getElementById("resultado").innerHTML = resultadoHTML;
+    return { resumen, equitativo };
+}
+
+function calcularTransferencias(nombres, montos, equitativo) {
+    const deudores = [];
+    const acreedores = [];
+
+    for (let i = 0; i < nombres.length; i++) {
+        const diferencia = parseFloat((montos[i] - equitativo).toFixed(2));
+        if (diferencia < 0) {
+            deudores.push({ nombre: nombres[i], debe: -diferencia });
+        } else if (diferencia > 0) {
+            acreedores.push({ nombre: nombres[i], recibe: diferencia });
+        }
+    }
+
+    let transferencias = "\n--- SUGERENCIA DE TRANSFERENCIAS ---\n";
+
+    while (deudores.length > 0 && acreedores.length > 0) {
+        const deudor = deudores[0];
+        const acreedor = acreedores[0];
+
+        const monto = Math.min(deudor.debe, acreedor.recibe);
+
+        transferencias += `${deudor.nombre} debe pagarle $${monto.toFixed(2)} a ${acreedor.nombre}\n`;
+
+        deudor.debe -= monto;
+        acreedor.recibe -= monto;
+
+        if (deudor.debe < 0.01) deudores.shift();
+        if (acreedor.recibe < 0.01) acreedores.shift();
+    }
+
+    return transferencias;
+}
+
+// Esta es la función que se ejecutará cuando el usuario haga clic en el botón
+function iniciarDivisor() {
+    const datos = pedirDatos();
+
+    if (datos) {
+        const { resumen, equitativo } = calcularResumen(datos.nombres, datos.montos);
+        const transferencias = calcularTransferencias(datos.nombres, datos.montos, equitativo);
+        alert(resumen + "\n" + transferencias);
+    }
 }
