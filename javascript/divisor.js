@@ -44,7 +44,7 @@ function calcularResumen(nombres, montos) {
 
     return { resumen, equitativo };
 }
-
+// Para las Transferencias 
 function calcularTransferencias(nombres, montos, equitativo) {
     const deudores = [];
     const acreedores = [];
@@ -58,7 +58,7 @@ function calcularTransferencias(nombres, montos, equitativo) {
         }
     }
 
-    let transferencias = "\n--- SUGERENCIA DE TRANSFERENCIAS ---\n";
+    let transferencias = "\n--- SUGERENCIA PARA TRANSFERIR ---\n";
 
     while (deudores.length > 0 && acreedores.length > 0) {
         const deudor = deudores[0];
@@ -78,7 +78,7 @@ function calcularTransferencias(nombres, montos, equitativo) {
     return transferencias;
 }
 
-// Esta es la función que se ejecutará cuando el usuario haga clic en el botón
+// Funcion del Botón
 function iniciarDivisor() {
     const datos = pedirDatos();
 
