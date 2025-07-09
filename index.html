@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Juntada Manager</title>
-    <link rel="stylesheet" href="./css/divisor.css">
-    <script src="./javascript/divisor.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juntada Manager</title>
+  <link rel="stylesheet" href="./css/divisor.css"/>
+  <script src="./javascript/divisor.js" defer></script>
 </head>
 
 <body>
- <h1>Divisor de Gastos</h1>
-    <button onclick="iniciarDivisor()">Iniciar</button>
+  <h1>Divisor de Gastos</h1>
 
+  <div id="form-container">
+    <label for="cantidadPersonas">¿Cuántas personas son?</label><br />
+    <input type="number" id="cantidadPersonas" min="1" /><br />
+    <button onclick="generarFormulario()">Continuar</button>
+  </div>
 
-
+  <div id="personasForm"></div>
+  <div id="resultado"></div>
 </body>
 </html>
